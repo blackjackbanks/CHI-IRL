@@ -85,6 +85,46 @@ class EventScraper:
             print(f"Unsupported event URL format: {url}")
             return None, None
 
+    def scrape_luma_event(self, url):
+        """
+        Scrape Lu.Ma event details
+        
+        Args:
+            url (str): Lu.Ma event URL
+        
+        Returns:
+            dict: Event details (start_datetime, end_datetime, image_url)
+        """
+        try:
+            response = self.session.get(url)
+            response.raise_for_status()
+            soup = BeautifulSoup(response.text, 'html.parser')
+            
+            # Find event time
+            time_element = soup.find('div', class_='event-date') or soup.find('time')
+            event_time = None
+            if time_element:
+                # Try to parse the date text
+                try:
+                    event_time = parser.parse(time_element.text, fuzzy=True)
+                except:
+                    pass
+            
+            # Find event image
+            image_url = None
+            og_image = soup.find('meta', property='og:image')
+            if og_image:
+                image_url = og_image.get('content')
+            
+            return {
+                'start_datetime': event_time.isoformat() if event_time else None,
+                'end_datetime': (event_time + timedelta(hours=2)).isoformat() if event_time else None,
+                'image_url': image_url
+            }
+        except Exception as e:
+            print(f"Error scraping Lu.Ma event: {str(e)}")
+            return None
+
 class GoogleCalendarSync:
     def __init__(self, credentials_path):
         self.credentials_path = credentials_path
@@ -295,6 +335,76 @@ class GoogleCalendarSync:
                 print(f"Failed to add event {row['eventName']}: {str(e)}")
                 continue
         
+        return added_event_ids
+
+    def add_luma_events(self, luma_urls):
+        """
+        Add Lu.Ma events to the selected Google Calendar
+        
+        Args:
+            luma_urls (list): List of Lu.Ma event URLs to scrape and add
+        
+        Returns:
+            list: List of added event IDs
+        """
+        if not self.calendar_id:
+            print("No calendar selected. Please select a calendar first.")
+            self.select_calendar()
+
+        added_event_ids = []
+        
+        for url in luma_urls:
+            try:
+                print(f"\nProcessing Lu.Ma event: {url}")
+                
+                # Scrape Lu.Ma event details
+                event_details = self.scraper.scrape_luma_event(url)
+                
+                if not event_details:
+                    print(f"Could not scrape event details from {url}")
+                    continue
+
+                # Extract start and end times
+                start_time = event_details.get('start_datetime')
+                end_time = event_details.get('end_datetime')
+                image_url = event_details.get('image_url')
+
+                if not start_time:
+                    print(f"No start time found for event: {url}")
+                    continue
+
+                # Prepare event for Google Calendar
+                event = {
+                    'summary': 'Lu.Ma Event',  # Default title, can be improved
+                    'location': url,
+                    'start': {
+                        'dateTime': start_time,
+                        'timeZone': 'America/Chicago',
+                    },
+                    'end': {
+                        'dateTime': end_time or (datetime.fromisoformat(start_time) + timedelta(hours=2)).isoformat(),
+                        'timeZone': 'America/Chicago',
+                    },
+                    'description': f'Event from Lu.Ma\nOriginal URL: {url}\n' + 
+                                   (f'Event Image: {image_url}' if image_url else '')
+                }
+
+                # Add event to Google Calendar
+                event_result = self.service.events().insert(calendarId=self.calendar_id, body=event).execute()
+                added_event_ids.append(event_result['id'])
+                
+                print(f"Added event to calendar: {event_result['htmlLink']}")
+
+                # Optionally upload event image to Google Drive
+                if image_url:
+                    try:
+                        self.drive_helper.upload_image_from_url(image_url, 'Lu.Ma Event')
+                    except Exception as img_error:
+                        print(f"Could not upload event image: {str(img_error)}")
+
+            except Exception as e:
+                print(f"Error processing Lu.Ma event {url}: {str(e)}")
+
         return added_event_ids
 
 def main():

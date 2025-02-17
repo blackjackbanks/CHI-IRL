@@ -1,7 +1,7 @@
 # Large files and unnecessary files for deployment
-Table2.csv
 *.csv
 venv/
+.venv/
 __pycache__/
 *.pyc
 *.pyo
@@ -15,3 +15,11 @@ __pycache__/
 base64_credentials.txt
 token.pickle
 credentials.json
+node_modules/
+.cache/
+.eggs/
+*.egg-info/
+dist/
+build/
+*.tar.gz
+*.zip

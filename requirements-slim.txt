@@ -1,0 +1,18 @@
+# Web Framework
+flask==2.1.0
+flask-cors==3.0.10
+
+# Web Scraping and Parsing
+requests==2.27.1
+beautifulsoup4==4.10.0
+python-dateutil==2.8.2
+
+# Google API Integration (Minimal)
+google-api-python-client==2.47.0
+google-auth-oauthlib==1.0.0
+
+# Configuration
+python-dotenv==0.20.0
+
+# Minimal dependencies to reduce package size
+# Carefully selected to maintain core functionality

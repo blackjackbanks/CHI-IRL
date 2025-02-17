@@ -31,8 +31,11 @@ def add_event():
         return jsonify({"error": "No event URL provided"}), 400
     
     try:
+        print(f"\nProcessing event URL: {event_url}")
         scraper = EventScraper()
         service = get_calendar_service()
+        
+        print("Successfully got calendar service")
         result = scraper.process_and_add_event(event_url, service)
         
         if result:
@@ -41,12 +44,17 @@ def add_event():
                 "event_details": result
             }), 200
         else:
+            print("Failed to process event - no result returned")
             return jsonify({
                 "error": "Could not process event",
                 "url": event_url
             }), 422
     
     except Exception as e:
+        import traceback
+        print(f"Error in add_event endpoint: {str(e)}")
+        print("Traceback:")
+        print(traceback.format_exc())
         return jsonify({
             "error": str(e),
             "url": event_url

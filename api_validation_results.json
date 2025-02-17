@@ -1,0 +1,50 @@
+{
+  "event_sources": {
+    "https://www.meetup.com/bootstrappers-breakfast-chicago/events/304560800/": {
+      "status": "SUCCESS",
+      "title": "VIRTUAL Bootstrappers Breakfast Chicago",
+      "start_datetime": "2025-02-20 08:30:00-06:00",
+      "end_datetime": "2025-02-20 10:00:00-06:00",
+      "location": "",
+      "image_url": "",
+      "description_validation": {
+        "has_content": true,
+        "has_rsvp_link": true,
+        "length": 798
+      }
+    },
+    "https://lu.ma/k2yrxjr1": {
+      "status": "SUCCESS",
+      "title": "Exclusive Happy Hour for Early-Stage B2B SaaS Founders and Funders",
+      "start_datetime": "2025-03-04 18:00:00-06:00",
+      "end_datetime": "2025-03-04 20:00:00-06:00",
+      "location": "Chicago, Illinois",
+      "image_url": [
+        "https://images.lumacdn.com/cdn-cgi/image/format=auto,fit=cover,dpr=2,anim=false,background=white,quality=75,width=500,height=500/event-covers/sv/2941588b-ec1f-44db-b7ac-9614346c43b1.png"
+      ],
+      "description_validation": {
+        "has_content": true,
+        "has_rsvp_link": true,
+        "length": 2312
+      }
+    },
+    "https://www.mhubchicago.com/events/genai-collective-chicago---how-ai-is-innovating-the-physical-world-128853": {
+      "status": "SUCCESS",
+      "title": "GenAI Collective Chicago - How AI is Innovating the Physical World",
+      "start_datetime": "2025-02-18 18:00:00-06:00",
+      "end_datetime": "2025-02-18 20:00:00-06:00",
+      "location": "mHUB 1623 W Fulton St 1623 W Fulton St, Chicago, IL 60612, US Get Directions",
+      "image_url": "https://peoplevine.blob.core.windows.net/media/397/3970abdc9af-bf67-4944-b490-a8c2386e05e2.jpg",
+      "description_validation": {
+        "has_content": true,
+        "has_rsvp_link": true,
+        "length": 2630
+      }
+    }
+  },
+  "calendar_integration": {
+    "status": "SUCCESS",
+    "event_id": "uu1n9a1sf84ur42g5de1qstm40",
+    "event_link": "https://www.google.com/calendar/event?eid=dXUxbjlhMXNmODR1cjQyZzVkZTFxc3RtNDAgYXJsaXNzLmJhbmtzQG0"
+  }
+}

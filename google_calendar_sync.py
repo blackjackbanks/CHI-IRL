@@ -1,6 +1,6 @@
 import os
 import json
-import pandas as pd
+import csv
 from datetime import datetime, timedelta
 from dateutil import parser
 from google.oauth2.credentials import Credentials
@@ -153,23 +153,34 @@ class GoogleCalendarSync:
             'https://www.googleapis.com/auth/drive'  # Add Drive scope
         ]
         
-        if os.path.exists('token.json'):
-            creds = Credentials.from_authorized_user_file('token.json', SCOPES)
-        
-        if not creds or not creds.valid:
-            if creds and creds.expired and creds.refresh_token:
-                creds.refresh(Request())
-            else:
-                flow = InstalledAppFlow.from_client_secrets_file(
-                    self.credentials_path, 
-                    SCOPES
-                )
-                creds = flow.run_local_server(port=0)
+        try:
+            if os.path.exists('token.json'):
+                creds = Credentials.from_authorized_user_file('token.json', SCOPES)
             
-            with open('token.json', 'w') as token:
-                token.write(creds.to_json())
+            if not creds or not creds.valid:
+                if creds and creds.expired and creds.refresh_token:
+                    try:
+                        creds.refresh(Request())
+                    except Exception as e:
+                        print(f"Error refreshing token: {e}")
+                        creds = None
+                
+                if not creds:
+                    flow = InstalledAppFlow.from_client_secrets_file(
+                        self.credentials_path, 
+                        SCOPES
+                    )
+                    creds = flow.run_local_server(port=0)
+                
+                # Save the refreshed/new credentials
+                with open('token.json', 'w') as token:
+                    token.write(creds.to_json())
 
-        return build('calendar', 'v3', credentials=creds)
+            return build('calendar', 'v3', credentials=creds)
+            
+        except Exception as e:
+            print(f"Error in authentication: {e}")
+            raise
 
     def list_calendars(self):
         """List all available calendars and return a dictionary of names and IDs."""
@@ -212,130 +223,53 @@ class GoogleCalendarSync:
     def add_events_from_csv(self, csv_path):
         """Add events from CSV file to the selected Google Calendar."""
         if not self.calendar_id:
-            print("No calendar selected. Please select a calendar first.")
             self.select_calendar()
 
         try:
-            df = pd.read_csv(csv_path, 
-                           quoting=1,
-                           doublequote=True,
-                           escapechar=None,
-                           encoding='utf-8',
-                           on_bad_lines='skip')
+            events_added = []
+            with open(csv_path, 'r', encoding='utf-8') as f:
+                reader = csv.DictReader(f)
+                for row in reader:
+                    event_url = row.get('Event URL', '').strip()
+                    if not event_url or event_url.lower() in ['', 'nan', 'none']:
+                        continue
+                        
+                    try:
+                        event_details = self.scraper.get_event_details(event_url)
+                        if event_details:
+                            # Add event to calendar
+                            event = {
+                                'summary': event_details[0],
+                                'location': event_details[1],
+                                'description': '',
+                                'start': {
+                                    'dateTime': event_details[0].isoformat(),
+                                    'timeZone': 'America/Chicago',
+                                },
+                                'end': {
+                                    'dateTime': (event_details[0] + timedelta(hours=2)).isoformat(),
+                                    'timeZone': 'America/Chicago',
+                                },
+                            }
+                            
+                            created_event = self.service.events().insert(
+                                calendarId=self.calendar_id,
+                                body=event
+                            ).execute()
+                            
+                            events_added.append(created_event['id'])
+                            print(f"Added event: {event_details[0]}")
+                            
+                    except Exception as e:
+                        print(f"Error adding event {event_url}: {str(e)}")
+                        continue
+                        
+            print(f"Successfully added {len(events_added)} events to calendar")
+            return events_added
+            
         except Exception as e:
             print(f"Error reading CSV: {str(e)}")
             return []
-
-        df = df[df['Status'] == 'approved']
-        if df.empty:
-            print("No approved events found in the CSV file.")
-            return []
-
-        added_event_ids = []
-        
-        for _, row in df.iterrows():
-            try:
-                print(f"\nProcessing event: {row['eventName']}")
-                
-                # Get scraped data if available
-                event_data = self.scraped_data.get(row['eventURL'], {})
-                
-                location = f"{row['eventVenueName']}, {row['eventAddress']}, {row['eventCity']}"
-                
-                # Create HTML-formatted description
-                description = f"""
-<html>
-<body>
-<p><a href="{row['eventURL']}"><b>RSVP</b></a></p>
-<br>
-{row['event_description']}
-
-<hr>
-<p><b>Event Details:</b></p>
-<ul>
-    <li>🏢 Venue: <a href="{row['eventGoogleMaps']}">{row['eventVenueName']}</a></li>
-    <li>📍 Address: {row['eventAddress']}, {row['eventCity']}</li>
-    <li>👥 Organized by: {row['groupName']}</li>
-</ul>
-
-</body>
-</html>"""
-                
-                # Set event time from scraped data or default
-                if event_data:
-                    if event_data.get('start_datetime'):
-                        start_time = parser.parse(event_data['start_datetime'])
-                        print(f"Using scraped start time: {start_time}")
-                        
-                        if event_data.get('end_datetime'):
-                            end_time = parser.parse(event_data['end_datetime'])
-                            print(f"Using scraped end time: {end_time}")
-                        else:
-                            # If no end time, default to 2 hours after start
-                            end_time = start_time + timedelta(hours=2)
-                            print(f"Using default end time: {end_time}")
-                    else:
-                        # No start time found, use default
-                        start_time = datetime.now().replace(hour=12, minute=0, second=0, microsecond=0)
-                        end_time = start_time + timedelta(hours=2)
-                        print("Using default event times")
-                else:
-                    # No scraped data, use default
-                    start_time = datetime.now().replace(hour=12, minute=0, second=0, microsecond=0)
-                    end_time = start_time + timedelta(hours=2)
-                    print("Using default event times")
-                
-                event = {
-                    'summary': row['eventName'].strip(),
-                    'location': location,
-                    'description': description,
-                    'start': {
-                        'dateTime': start_time.isoformat(),
-                        'timeZone': 'America/Chicago',
-                    },
-                    'end': {
-                        'dateTime': end_time.isoformat(),
-                        'timeZone': 'America/Chicago',
-                    },
-                    'source': {
-                        'url': row['eventURL'],
-                        'title': 'Chicago Tech Events'
-                    }
-                }
-
-                # Handle image attachment if available
-                if event_data and event_data.get('image_url'):
-                    image_url = event_data['image_url']
-                    file_id, web_view_link = self.drive_helper.upload_image_from_url(
-                        image_url, 
-                        row['eventName']
-                    )
-                    
-                    if file_id:
-                        # Add attachment to event
-                        event['attachments'] = [{
-                            'fileUrl': web_view_link,
-                            'title': f"Event image for {row['eventName']}",
-                            'mimeType': 'image/jpeg',  # Default to JPEG
-                            'iconLink': 'https://drive-thirdparty.googleusercontent.com/16/type/image/jpeg'
-                        }]
-                        
-                        # Add image preview in description
-                        description += f'\n<br><img src="{web_view_link}" style="max-width:100%;">'
-                
-                created_event = self.service.events().insert(
-                    calendarId=self.calendar_id,
-                    body=event,
-                    supportsAttachments=True  # Required for attachments
-                ).execute()
-                
-                added_event_ids.append(created_event['id'])
-                print(f"Added event: {row['eventName']}")
-            except Exception as e:
-                print(f"Failed to add event {row['eventName']}: {str(e)}")
-                continue
-        
-        return added_event_ids
 
     def add_luma_events(self, luma_urls):
         """
@@ -406,6 +340,12 @@ class GoogleCalendarSync:
                 print(f"Error processing Lu.Ma event {url}: {str(e)}")
 
         return added_event_ids
+
+def get_calendar_service():
+    """Helper function for backward compatibility"""
+    credentials_path = 'credentials.json'
+    calendar_sync = GoogleCalendarSync(credentials_path)
+    return calendar_sync.service
 
 def main():
     credentials_path = 'credentials.json'

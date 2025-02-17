@@ -1,0 +1,87 @@
+{
+  "https://www.meetup.com/pumping-station-one/events/305320087/": {
+    "start_datetime": "2025-02-10T19:00:00-06:00",
+    "end_datetime": "2025-02-10T21:00:00-06:00",
+    "image_url": "https://secure.meetupstatic.com/photos/event/c/e/4/c/600_455692812.jpeg"
+  },
+  "https://www.meetup.com/js-chi/events/304402684/": {
+    "start_datetime": "2025-02-11T17:30:00-06:00",
+    "end_datetime": "2025-02-11T19:30:00-06:00",
+    "image_url": "https://secure.meetupstatic.com/photos/event/9/4/4/c/600_525577964.jpeg"
+  },
+  "https://www.mhubchicago.com/events/product-and-strategy-103---the-how---feasibility-in-discovery--123503": {
+    "start_datetime": null,
+    "end_datetime": null,
+    "image_url": "https://peoplevine.blob.core.windows.net/media/397/397b38caa8f-9577-4910-a026-051bd3155d62.png"
+  },
+  "https://www.mhubchicago.com/events/mhub-industry-disruptors---matt-hulsizer-and-jenny-just-122457": {
+    "start_datetime": null,
+    "end_datetime": null,
+    "image_url": "https://peoplevine.blob.core.windows.net/media/397/397a1384c71-e133-45d2-a3e0-f5fa8a2ddfb6.png"
+  },
+  "https://www.meetup.com/chipma/events/305182993/": {
+    "start_datetime": "2025-02-13T17:45:00-06:00",
+    "end_datetime": "2025-02-13T19:45:00-06:00",
+    "image_url": "https://secure.meetupstatic.com/photos/event/2/b/6/3/600_525311107.jpeg"
+  },
+  "https://www.meetup.com/chibitdevs/events/jqtzltyhcdbrb/": {
+    "start_datetime": "2025-02-13T18:00:00-06:00",
+    "end_datetime": "2025-02-13T20:00:00-06:00",
+    "image_url": "https://secure.meetupstatic.com/photos/event/6/c/3/a/600_484947706.jpeg"
+  },
+  "https://www.meetup.com/nerp-not-exclusively-raspberry-pi/events/jvfqvsyhcdbwb/": {
+    "start_datetime": "2025-02-17T19:00:00-06:00",
+    "end_datetime": "2025-02-17T21:00:00-06:00",
+    "image_url": "https://secure.meetupstatic.com/photos/event/c/e/7/c/600_447892860.jpeg"
+  },
+  "https://www.meetup.com/ai-2030-responsible-artificial-intelligence/events/nzcdptyhcfbgb/": {
+    "start_datetime": "2025-03-04T17:30:00-06:00",
+    "end_datetime": "2025-03-04T19:30:00-06:00",
+    "image_url": "https://secure.meetupstatic.com/photos/event/6/b/6/5/600_524847493.jpeg"
+  },
+  "https://www.meetup.com/_chipy_/events/302396651/": {
+    "start_datetime": "2025-03-06T18:30:00-06:00",
+    "end_datetime": "2025-03-06T20:30:00-06:00",
+    "image_url": "https://secure.meetupstatic.com/photos/event/c/2/d/e/600_491029886.jpeg"
+  },
+  "https://www.meetup.com/ai-2030-responsible-artificial-intelligence/events/nzcdptyhcgbcb/": {
+    "start_datetime": "2025-04-01T17:30:00-05:00",
+    "end_datetime": "2025-04-01T19:30:00-05:00",
+    "image_url": "https://secure.meetupstatic.com/photos/event/6/b/6/5/600_524847493.jpeg"
+  },
+  "https://www.meetup.com/_chipy_/events/302396652/": {
+    "start_datetime": "2025-04-03T18:30:00-05:00",
+    "end_datetime": "2025-04-03T20:30:00-05:00",
+    "image_url": "https://secure.meetupstatic.com/photos/event/c/2/d/e/600_491029886.jpeg"
+  },
+  "https://www.meetup.com/ai-2030-responsible-artificial-intelligence/events/nzcdptyhchbjb/": {
+    "start_datetime": "2025-05-06T17:30:00-05:00",
+    "end_datetime": "2025-05-06T19:30:00-05:00",
+    "image_url": "https://secure.meetupstatic.com/photos/event/6/b/6/5/600_524847493.jpeg"
+  },
+  "https://www.meetup.com/ai-2030-responsible-artificial-intelligence/events/nzcdptyhcjbfb/": {
+    "start_datetime": "2025-06-03T17:30:00-05:00",
+    "end_datetime": "2025-06-03T19:30:00-05:00",
+    "image_url": "https://secure.meetupstatic.com/photos/event/6/b/6/5/600_524847493.jpeg"
+  },
+  "https://www.meetup.com/_chipy_/events/302396654/": {
+    "start_datetime": "2025-06-05T18:30:00-05:00",
+    "end_datetime": "2025-06-05T20:30:00-05:00",
+    "image_url": "https://secure.meetupstatic.com/photos/event/c/2/d/e/600_491029886.jpeg"
+  },
+  "https://www.meetup.com/ai-2030-responsible-artificial-intelligence/events/nzcdptyhckbcb/": {
+    "start_datetime": "2025-07-01T17:30:00-05:00",
+    "end_datetime": "2025-07-01T19:30:00-05:00",
+    "image_url": "https://secure.meetupstatic.com/photos/event/6/b/6/5/600_524847493.jpeg"
+  },
+  "https://www.meetup.com/chicagoleanstartup/events/305471384/": {
+    "start_datetime": null,
+    "end_datetime": null,
+    "image_url": "https://secure.meetupstatic.com/next/images/shared/meetup-logo.jpg"
+  },
+  "https://www.meetup.com/ai-2030-responsible-artificial-intelligence/events/305455980/": {
+    "start_datetime": "2025-03-04T17:30:00-06:00",
+    "end_datetime": "2025-03-04T19:30:00-06:00",
+    "image_url": "https://secure.meetupstatic.com/photos/event/6/b/6/5/600_524847493.jpeg"
+  }
+}

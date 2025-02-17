@@ -45,3 +45,8 @@ build/
 
 # Jupyter Notebook
 .ipynb_checkpoints
+
+# Specific large CSV files
+Table2.csv
+
+.vercel

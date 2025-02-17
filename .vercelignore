@@ -1,0 +1,17 @@
+# Large files and unnecessary files for deployment
+Table2.csv
+*.csv
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.git/
+.github/
+.pytest_cache/
+.mypy_cache/
+*.log
+*.sqlite3
+base64_credentials.txt
+token.pickle
+credentials.json

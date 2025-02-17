@@ -7,7 +7,8 @@
             "config": {
                 "maxLambdaSize": "250mb",
                 "runtime": "python3.9",
-                "requirementsPath": "requirements-slim.txt"
+                "requirementsPath": "requirements-slim.txt",
+                "installCommand": "pip install -r requirements-slim.txt --no-cache-dir --no-deps && pip install google-api-python-client google-auth-oauthlib --no-cache-dir"
             }
         }
     ],

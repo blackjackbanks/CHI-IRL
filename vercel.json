@@ -6,17 +6,17 @@
             "use": "@vercel/python",
             "config": {
                 "maxLambdaSize": "250mb",
-                "runtime": "python3.9"
+                "runtime": "python3.12"
             }
         }
     ],
-    "rewrites": [
-        { "source": "/add_event", "destination": "/api/index" },
-        { "source": "/", "destination": "/api/index" },
-        { "source": "/(.*)", "destination": "/api/index" }
+    "routes": [
+        { "src": "/add_event", "dest": "api/index.py" },
+        { "src": "/", "dest": "api/index.py" },
+        { "src": "/(.*)", "dest": "api/index.py" }
     ],
     "env": {
-        "PYTHON_VERSION": "3.9",
+        "PYTHON_VERSION": "3.12",
         "FLASK_ENV": "production"
     },
     "regions": ["iad1"]

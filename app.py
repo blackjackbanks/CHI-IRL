@@ -1,5 +1,5 @@
 import os
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, Response
 from flask_cors import CORS
 from dotenv import load_dotenv
 
@@ -61,6 +61,11 @@ def create_app():
                 "error": "Internal server error",
                 "details": str(e)
             }), 500
+
+    # Catch-all route for Vercel
+    @app.route('/<path:path>', methods=['GET', 'POST'])
+    def catch_all(path):
+        return index()
 
     return app
 

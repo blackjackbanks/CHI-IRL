@@ -7,7 +7,13 @@
             "config": {
                 "maxLambdaSize": "250mb",
                 "runtime": "python3.12",
-                "installCommand": "pip install -r requirements.txt"
+                "installCommand": "pip install -r requirements.txt",
+                "includeFiles": [
+                    "app.py",
+                    "event_scraper.py", 
+                    "google_calendar_sync.py",
+                    "requirements.txt"
+                ]
             }
         }
     ],

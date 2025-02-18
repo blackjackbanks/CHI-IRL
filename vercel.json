@@ -29,6 +29,5 @@
         "PYTHON_VERSION": "3.9",
         "FLASK_ENV": "production"
     },
-    "regions": ["iad1"],
-    "framework": "flask"
+    "regions": ["iad1"]
 }

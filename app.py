@@ -26,7 +26,11 @@ def create_app():
 
     @app.route('/add_event', methods=['POST'])
     def add_event():
-        event_url = request.json.get('event_url')
+        # Handle both JSON and form data
+        if request.is_json:
+            event_url = request.json.get('event_url')
+        else:
+            event_url = request.form.get('event_url')
         
         if not event_url:
             return jsonify({"error": "No event URL provided"}), 400
@@ -60,10 +64,8 @@ def create_app():
 
     return app
 
-# Vercel requires this for serverless deployment
-app = create_app()
-
 # For local development
 if __name__ == '__main__':
+    app = create_app()
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port)

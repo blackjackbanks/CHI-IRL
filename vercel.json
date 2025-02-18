@@ -2,28 +2,26 @@
     "version": 2,
     "builds": [
         {
-            "src": "app.py",
+            "src": "api/index.py",
             "use": "@vercel/python",
             "config": {
                 "maxLambdaSize": "250mb",
-                "runtime": "python3.9",
-                "includeFiles": [
-                    "event_scraper.py",
-                    "google_calendar_sync.py",
-                    "token.json"
-                ]
+                "runtime": "python3.9"
             }
         }
     ],
     "routes": [
         {
             "src": "/add_event",
-            "dest": "app.py"
+            "dest": "api/index.py"
         },
         {
             "src": "/",
-            "dest": "app.py"
+            "dest": "api/index.py"
         }
+    ],
+    "rewrites": [
+        { "source": "/(.*)", "destination": "/api/index" }
     ],
     "env": {
         "PYTHON_VERSION": "3.9",

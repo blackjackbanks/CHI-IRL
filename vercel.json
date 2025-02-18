@@ -6,18 +6,29 @@
             "use": "@vercel/python",
             "config": {
                 "maxLambdaSize": "250mb",
-                "runtime": "python3.9"
+                "runtime": "python3.9",
+                "includeFiles": [
+                    "event_scraper.py",
+                    "google_calendar_sync.py",
+                    "token.json"
+                ]
             }
         }
     ],
     "routes": [
         {
-            "src": "/(.*)",
+            "src": "/add_event",
+            "dest": "app.py"
+        },
+        {
+            "src": "/",
             "dest": "app.py"
         }
     ],
     "env": {
-        "PYTHON_VERSION": "3.9"
+        "PYTHON_VERSION": "3.9",
+        "FLASK_ENV": "production"
     },
-    "regions": ["iad1"]
+    "regions": ["iad1"],
+    "framework": "flask"
 }

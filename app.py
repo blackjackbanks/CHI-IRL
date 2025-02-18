@@ -10,59 +10,58 @@ load_dotenv()
 from event_scraper import EventScraper
 from google_calendar_sync import get_calendar_service
 
-app = Flask(__name__)
-CORS(app)  # Enable CORS for Carrd integration
+def create_app():
+    app = Flask(__name__)
+    CORS(app)  # Enable CORS for Carrd integration
 
-@app.route('/', methods=['GET'])
-def index():
-    return jsonify({
-        "message": "Event Scraper API",
-        "endpoints": {
-            "add_event": "/add_event",
-            "supported_sources": ["Meetup.com", "mHUB Chicago"]
-        }
-    })
-
-@app.route('/add_event', methods=['POST'])
-def add_event():
-    event_url = request.json.get('event_url')
-    
-    if not event_url:
-        return jsonify({"error": "No event URL provided"}), 400
-    
-    try:
-        print(f"\nProcessing event URL: {event_url}")
-        scraper = EventScraper()
-        service = get_calendar_service()
-        
-        print("Successfully got calendar service")
-        result = scraper.process_and_add_event(event_url, service)
-        
-        if result:
-            return jsonify({
-                "status": "success",
-                "event_details": result
-            }), 200
-        else:
-            print("Failed to process event - no result returned")
-            return jsonify({
-                "error": "Could not process event",
-                "url": event_url
-            }), 422
-    
-    except Exception as e:
-        import traceback
-        print(f"Error in add_event endpoint: {str(e)}")
-        print("Traceback:")
-        print(traceback.format_exc())
+    @app.route('/', methods=['GET'])
+    def index():
         return jsonify({
-            "error": str(e),
-            "url": event_url
-        }), 500
+            "message": "Event Scraper API",
+            "endpoints": {
+                "add_event": "/add_event",
+                "supported_sources": ["Meetup.com", "mHUB Chicago"]
+            }
+        })
+
+    @app.route('/add_event', methods=['POST'])
+    def add_event():
+        event_url = request.json.get('event_url')
+        
+        if not event_url:
+            return jsonify({"error": "No event URL provided"}), 400
+        
+        try:
+            print(f"\nProcessing event URL: {event_url}")
+            scraper = EventScraper()
+            service = get_calendar_service()
+            
+            print("Successfully got calendar service")
+            result = scraper.process_and_add_event(event_url, service)
+            
+            if result:
+                return jsonify({
+                    "status": "success",
+                    "event_details": result
+                }), 200
+            else:
+                print("Failed to process event - no result returned")
+                return jsonify({
+                    "error": "Could not process event",
+                    "url": event_url
+                }), 422
+        
+        except Exception as e:
+            print(f"Error processing event: {e}")
+            return jsonify({
+                "error": "Internal server error",
+                "details": str(e)
+            }), 500
+
+    return app
 
 # Vercel requires this for serverless deployment
-def create_app():
-    return app
+app = create_app()
 
 # For local development
 if __name__ == '__main__':

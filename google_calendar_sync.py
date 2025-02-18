@@ -147,39 +147,32 @@ class GoogleCalendarSync:
             print(f"Error loading scraped data: {str(e)}")
 
     def _get_calendar_service(self):
-        creds = None
-        SCOPES = [
-            'https://www.googleapis.com/auth/calendar',
-            'https://www.googleapis.com/auth/drive'  # Add Drive scope
-        ]
+        import os
+        import base64
+        import json
+        from google.oauth2.credentials import Credentials
+        from googleapiclient.discovery import build
+        
+        # Retrieve base64 encoded credentials from environment
+        base64_credentials = os.environ.get('GOOGLE_CREDENTIALS_BASE64')
+        
+        if not base64_credentials:
+            raise ValueError("No Google credentials found in environment. Set GOOGLE_CREDENTIALS_BASE64.")
         
         try:
-            if os.path.exists('token.json'):
-                creds = Credentials.from_authorized_user_file('token.json', SCOPES)
+            # Decode base64 credentials
+            credentials_json = base64.b64decode(base64_credentials).decode('utf-8')
+            credentials_dict = json.loads(credentials_json)
             
-            if not creds or not creds.valid:
-                if creds and creds.expired and creds.refresh_token:
-                    try:
-                        creds.refresh(Request())
-                    except Exception as e:
-                        print(f"Error refreshing token: {e}")
-                        creds = None
-                
-                if not creds:
-                    flow = InstalledAppFlow.from_client_secrets_file(
-                        self.credentials_path, 
-                        SCOPES
-                    )
-                    creds = flow.run_local_server(port=0)
-                
-                # Save the refreshed/new credentials
-                with open('token.json', 'w') as token:
-                    token.write(creds.to_json())
-
-            return build('calendar', 'v3', credentials=creds)
+            # Create credentials object
+            creds = Credentials.from_authorized_user_info(info=credentials_dict)
             
+            # Build and return calendar service
+            service = build('calendar', 'v3', credentials=creds)
+            return service
+        
         except Exception as e:
-            print(f"Error in authentication: {e}")
+            print(f"Error loading Google Calendar credentials: {e}")
             raise
 
     def list_calendars(self):
@@ -342,10 +335,39 @@ class GoogleCalendarSync:
         return added_event_ids
 
 def get_calendar_service():
-    """Helper function for backward compatibility"""
-    credentials_path = 'credentials.json'
-    calendar_sync = GoogleCalendarSync(credentials_path)
-    return calendar_sync.service
+    """
+    Get Google Calendar service using base64 encoded credentials from environment
+    
+    Returns:
+        googleapiclient.discovery.Resource: Authenticated Google Calendar service
+    """
+    import os
+    import base64
+    import json
+    from google.oauth2.credentials import Credentials
+    from googleapiclient.discovery import build
+    
+    # Retrieve base64 encoded credentials from environment
+    base64_credentials = os.environ.get('GOOGLE_CREDENTIALS_BASE64')
+    
+    if not base64_credentials:
+        raise ValueError("No Google credentials found in environment. Set GOOGLE_CREDENTIALS_BASE64.")
+    
+    try:
+        # Decode base64 credentials
+        credentials_json = base64.b64decode(base64_credentials).decode('utf-8')
+        credentials_dict = json.loads(credentials_json)
+        
+        # Create credentials object
+        creds = Credentials.from_authorized_user_info(info=credentials_dict)
+        
+        # Build and return calendar service
+        service = build('calendar', 'v3', credentials=creds)
+        return service
+    
+    except Exception as e:
+        print(f"Error loading Google Calendar credentials: {e}")
+        raise
 
 def main():
     credentials_path = 'credentials.json'

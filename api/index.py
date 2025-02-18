@@ -1,10 +1,11 @@
 import sys
 import os
-import json
 
-# Add the parent directory to Python path
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+# Add project root to Python path
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+sys.path.insert(0, project_root)
 
+# Absolute imports
 from app import create_app
 from flask import request
 

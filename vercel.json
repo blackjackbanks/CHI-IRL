@@ -6,13 +6,12 @@
             "use": "@vercel/python",
             "config": {
                 "maxLambdaSize": "250mb",
-                "runtime": "python3.12"
+                "runtime": "python3.12",
+                "installCommand": "pip install -r requirements.txt"
             }
         }
     ],
     "routes": [
-        { "src": "/add_event", "dest": "api/index.py" },
-        { "src": "/", "dest": "api/index.py" },
         { "src": "/(.*)", "dest": "api/index.py" }
     ],
     "env": {

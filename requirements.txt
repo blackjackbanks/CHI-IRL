@@ -1,7 +1,7 @@
-# Web Framework
+# Web Framework (Explicitly first)
 flask==3.0.3
 flask-cors==3.0.10
-werkzeug==2.0.3
+werkzeug==2.3.8
 
 # Web Scraping and Parsing
 requests==2.27.1

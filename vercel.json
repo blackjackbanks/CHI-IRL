@@ -10,17 +10,9 @@
             }
         }
     ],
-    "routes": [
-        {
-            "src": "/add_event",
-            "dest": "api/index.py"
-        },
-        {
-            "src": "/",
-            "dest": "api/index.py"
-        }
-    ],
     "rewrites": [
+        { "source": "/add_event", "destination": "/api/index" },
+        { "source": "/", "destination": "/api/index" },
         { "source": "/(.*)", "destination": "/api/index" }
     ],
     "env": {

@@ -2,8 +2,9 @@ from flask import Flask, request, jsonify
 
 app = Flask(__name__)
 
-@app.route('/')
-def home():
+@app.route('/', defaults={'path': ''})
+@app.route('/<path:path>')
+def home(path):
     return jsonify({
         "message": "Event Scraper API",
         "endpoints": {

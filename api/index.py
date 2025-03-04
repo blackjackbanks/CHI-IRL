@@ -1,7 +1,7 @@
-from http.server import BaseHTTPRequestHandler
-from flask import Flask, Response
 import sys
 import os
+import json
+from urllib.parse import parse_qs
 
 # Get the absolute path of the project root
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
@@ -12,81 +12,53 @@ from app import create_app
 # Create the Flask app
 app = create_app()
 
-def handler(request):
+def handler(request, context):
     """
     Vercel serverless function handler
     """
-    # Get the path from the request
+    # Get request details
+    http_method = request.get('method', 'GET')
     path = request.get('path', '/')
-    if path.endswith('/'):
-        path = path[:-1]
-    
-    # Get the HTTP method
-    method = request.get('method', 'GET')
-    
-    # Create the environment for Flask
-    environ = {
-        'REQUEST_METHOD': method,
-        'PATH_INFO': path,
-        'QUERY_STRING': '',
-        'SERVER_NAME': 'vercel',
-        'SERVER_PORT': '443',
-        'SERVER_PROTOCOL': 'HTTP/1.1',
-        'wsgi.version': (1, 0),
-        'wsgi.url_scheme': 'https',
-        'wsgi.input': None,
-        'wsgi.errors': sys.stderr,
-        'wsgi.multithread': False,
-        'wsgi.multiprocess': False,
-        'wsgi.run_once': False,
-    }
+    headers = request.get('headers', {})
+    body = request.get('body', '')
+    query_params = request.get('query', {})
 
-    # Add query parameters if present
-    if 'query' in request:
-        environ['QUERY_STRING'] = '&'.join(f"{k}={v}" for k, v in request['query'].items())
+    # Convert query params to Flask format
+    if query_params:
+        path += '?' + '&'.join(f"{k}={v}" for k, v in query_params.items())
+
+    # Create test environment
+    environ = {
+        'REQUEST_METHOD': http_method,
+        'PATH_INFO': path,
+        'CONTENT_TYPE': headers.get('content-type', ''),
+        'CONTENT_LENGTH': str(len(body)) if body else '0',
+        'HTTP_HOST': headers.get('host', 'localhost'),
+    }
 
     # Add headers
-    if 'headers' in request:
-        for key, value in request['headers'].items():
-            key = key.upper().replace('-', '_')
-            if key not in ('CONTENT_TYPE', 'CONTENT_LENGTH'):
-                key = f'HTTP_{key}'
-            environ[key] = value
+    for key, value in headers.items():
+        key = 'HTTP_' + key.upper().replace('-', '_')
+        environ[key] = value
 
-    # Handle the request body
-    if 'body' in request and request['body']:
-        environ['wsgi.input'] = request['body']
-        environ['CONTENT_LENGTH'] = str(len(request['body']))
+    # Create test client
+    with app.test_client() as client:
+        # Make the request
+        response = client.open(
+            path=path,
+            method=http_method,
+            data=body,
+            environ_base=environ
+        )
 
-    # Create response headers list
-    headers_set = []
-    headers_sent = []
+        # Get response data
+        response_data = response.get_data()
+        if isinstance(response_data, bytes):
+            response_data = response_data.decode('utf-8')
 
-    def write(data):
-        """Write response data"""
-        headers_sent[:] = headers_set[:]
-        return data
-
-    def start_response(status, response_headers, exc_info=None):
-        """Start the response"""
-        headers_set[:] = [status, response_headers]
-        return write
-
-    # Get response from Flask app
-    response = app(environ, start_response)
-    
-    # Get status code
-    status_code = int(headers_set[0].split()[0])
-    
-    # Convert headers to dict
-    headers = dict(headers_set[1])
-    
-    # Get response body
-    body = b''.join(response)
-    
-    # Return response in Vercel format
-    return {
-        'statusCode': status_code,
-        'headers': headers,
-        'body': body.decode('utf-8')
-    }
+        # Return Vercel response format
+        return {
+            'statusCode': response.status_code,
+            'headers': dict(response.headers),
+            'body': response_data
+        }

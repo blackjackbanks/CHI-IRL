@@ -3,28 +3,17 @@
     "builds": [
         {
             "src": "api/index.py",
-            "use": "@vercel/python",
-            "config": {
-                "maxLambdaSize": "250mb",
-                "runtime": "python3.9",
-                "installCommand": "bash api/build.sh",
-                "includeFiles": [
-                    "api/**",
-                    "*.py",
-                    "requirements.txt"
-                ]
-            }
+            "use": "@vercel/python"
         }
     ],
     "routes": [
-        { "src": "/(.*)", "dest": "api/index.py" }
+        { "src": "/(.*)", "dest": "/api/index.py" }
+    ],
+    "rewrites": [
+        { "source": "/(.*)", "destination": "/api/index" }
     ],
     "env": {
-        "PYTHON_VERSION": "3.9",
-        "FLASK_ENV": "production"
+        "PYTHON_VERSION": "3.9"
     },
-    "rewrites": [
-      { "source": "/(.*)", "destination": "/api/index" }
-    ],
     "regions": ["iad1"]
 }

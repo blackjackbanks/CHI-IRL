@@ -23,5 +23,8 @@
         "PYTHON_VERSION": "3.9",
         "FLASK_ENV": "production"
     },
+    "rewrites": [
+      { "source": "/(.*)", "destination": "/api/index" }
+    ],
     "regions": ["iad1"]
 }

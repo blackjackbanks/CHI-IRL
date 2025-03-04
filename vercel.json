@@ -3,10 +3,17 @@
     "builds": [
         {
             "src": "api/index.py",
-            "use": "@vercel/python"
+            "use": "@vercel/python",
+            "config": {
+                "runtime": "python3.9",
+                "pip": ["flask==3.0.3"]
+            }
         }
     ],
-    "rewrites": [
-        { "source": "/(.*)", "destination": "/api" }
+    "routes": [
+        {
+            "src": "/(.*)",
+            "dest": "/api/index.py"
+        }
     ]
 }

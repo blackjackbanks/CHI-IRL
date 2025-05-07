@@ -17,8 +17,7 @@ logging.basicConfig(
 # Add the current directory to Python path
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-from event_scraper import EventScraper
-from google_calendar_sync import get_calendar_service
+from google_calendar_sync import GoogleCalendarSync, EventScraper
 
 def sanitize_for_logging(text):
     """
@@ -46,7 +45,7 @@ def test_event_scraping(url):
             # Optional: Test Google Calendar integration
             try:
                 logging.info("Attempting to get Google Calendar service...")
-                calendar_service = get_calendar_service()
+                calendar_service = GoogleCalendarSync().get_calendar_service()
                 logging.info("Successfully obtained calendar service")
                 
                 # Detailed logging of event details before adding

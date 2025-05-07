@@ -62,37 +62,84 @@ class GoogleDriveHelper:
             if not self.folder_id:
                 self.create_events_folder()
 
-            # Download image
-            response = requests.get(image_url)
-            response.raise_for_status()
+            # Download image with timeout and proper error handling
+            try:
+                response = requests.get(image_url, timeout=15, stream=True)
+                response.raise_for_status()
+                
+                # Check if the content is too large (>5MB)
+                content_length = int(response.headers.get('content-length', 0))
+                if content_length > 5 * 1024 * 1024:  # 5MB
+                    print(f"Image too large ({content_length/1024/1024:.2f}MB): {image_url}")
+                    return None, None
+                
+                # Get content
+                image_content = response.content
+                
+                # Verify this is actually an image
+                content_type = response.headers.get('content-type', 'image/jpeg')
+                if not content_type.startswith('image/'):
+                    print(f"URL does not point to an image (content-type: {content_type}): {image_url}")
+                    return None, None
+                
+            except requests.exceptions.RequestException as e:
+                print(f"Error downloading image from {image_url}: {str(e)}")
+                return None, None
             
             # Determine file extension and mime type
             content_type = response.headers.get('content-type', 'image/jpeg')
             ext = mimetypes.guess_extension(content_type) or '.jpg'
             
+            # Sanitize event name for filename
+            safe_event_name = ''.join(c if c.isalnum() or c in ' -_' else '_' for c in event_name)
+            safe_event_name = safe_event_name[:50]  # Limit filename length
+            
             # Create file metadata
             file_metadata = {
-                'name': f"{event_name}{ext}",
+                'name': f"{safe_event_name}{ext}",
                 'parents': [self.folder_id]
             }
             
             # Create media
-            fh = BytesIO(response.content)
+            fh = BytesIO(image_content)
             media = MediaIoBaseUpload(
                 fh,
                 mimetype=content_type,
                 resumable=True
             )
             
-            # Upload file
-            file = self.service.files().create(
-                body=file_metadata,
-                media_body=media,
-                fields='id, webViewLink'
-            ).execute()
+            # Upload file with retry
+            max_retries = 3
+            retry_count = 0
+            while retry_count < max_retries:
+                try:
+                    file = self.service.files().create(
+                        body=file_metadata,
+                        media_body=media,
+                        fields='id, webViewLink'
+                    ).execute()
+                    
+                    print(f"Uploaded image for event: {event_name}")
+                    
+                    # Make sure the file is accessible
+                    self.service.permissions().create(
+                        fileId=file.get('id'),
+                        body={'type': 'anyone', 'role': 'reader'},
+                        fields='id'
+                    ).execute()
+                    
+                    return file.get('id'), file.get('webViewLink')
+                except Exception as upload_error:
+                    retry_count += 1
+                    if retry_count >= max_retries:
+                        print(f"Failed to upload after {max_retries} attempts: {str(upload_error)}")
+                        return None, None
+                    
+                    print(f"Upload attempt {retry_count} failed: {str(upload_error)}. Retrying...")
+                    import time
+                    time.sleep(2 ** retry_count)  # Exponential backoff
             
-            print(f"Uploaded image for event: {event_name}")
-            return file.get('id'), file.get('webViewLink')
+            return None, None
             
         except Exception as e:
             print(f"Error uploading image for {event_name}: {str(e)}")

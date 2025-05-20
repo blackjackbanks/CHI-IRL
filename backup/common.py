@@ -31,7 +31,7 @@ def list_to_df(event_list):
 def upload_to_gsheets(events_df, sheet_name = "Events", key_columns=['eventURL'], verbose=False):
     # Authenticate and initialize the Google Sheets client
     scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-    creds = ServiceAccountCredentials.from_json_keyfile_name("chicago-events-435701-b0daa42d7c25.json", scope)
+    creds = ServiceAccountCredentials.from_json_keyfile_name("x.json", scope)
     client = gspread.authorize(creds)
 
     # Open the Google Sheet and select a specific worksheet by title
@@ -64,7 +64,7 @@ def upload_to_gsheets(events_df, sheet_name = "Events", key_columns=['eventURL']
 def get_gsheet_df(worksheet_title):
     # Authenticate and initialize the Google Sheets client
     scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-    creds = ServiceAccountCredentials.from_json_keyfile_name("chicago-events-435701-b0daa42d7c25.json", scope)
+    creds = ServiceAccountCredentials.from_json_keyfile_name("x.json", scope)
     client = gspread.authorize(creds)
 
     # Open the Google Sheet and select a specific worksheet by title
